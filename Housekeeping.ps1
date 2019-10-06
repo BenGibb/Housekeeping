@@ -1,12 +1,14 @@
-function Get-ItemsGrouped {
+function Get-FilesGrouped {
     [CmdletBinding()]
     param (
         # Source Path
         [Parameter(ParameterSetName = 'Created', Mandatory = $true)]
         [Parameter(ParameterSetName = 'Accessed', Mandatory = $true)]
         [Parameter(ParameterSetName = 'Updated', Mandatory = $true)]
+        [Parameter(ParameterSetName = 'Extension', Mandatory = $true)]
         [string]
         $Path,
+        #region Date Grouping
         # Group by CreationTime
         [Parameter(ParameterSetName = 'Created', Mandatory = $true)]
         [switch]
@@ -24,7 +26,16 @@ function Get-ItemsGrouped {
         [Parameter(ParameterSetName = 'Accessed', Mandatory = $false)]
         [Parameter(ParameterSetName = 'Updated', Mandatory = $false)]
         [string]
-        $DateFormat = 'yyyyMMdd'
+        $DateFormat = 'yyyyMMdd',
+        #endregion Date Grouping
+
+        #region Type Grouping
+        [Parameter(ParameterSetName = 'Extension', Mandatory = $true)]
+        [Alias('ByExt')]
+        [switch]
+        $ByExtension
+        #endregion Type Grouping
+
     )
     
     begin {
@@ -32,7 +43,8 @@ function Get-ItemsGrouped {
 
         [array]$FileProperties = @(
             'FullName'
-            'length'
+            'Length'
+            'Extension'
             @{
                 Name       = 'Created'
                 Expression = { $_.CreationTime.ToString($DateFormat) }
@@ -70,19 +82,25 @@ function Get-ItemsGrouped {
     }
 }
 
+
 <# 
-$Files = Get-ChildItem -Path $SourcePath -Recurse
-
-
-$groups = get-childitem -Path $SourcePath |
-    Select-Object -Property FullName, length, @{Name = "Updated"; Expression = { $_.lastwritetime.ToString('yyyyMM') } } |
-    group-object -property Updated;
-foreach ($g in $groups) {
-    $groupsize = 0;
-    foreach ($item in $g.group) {
-        $groupsize += Get-item $item.FullName | Select-Object -ExpandProperty length;
+function Move-FilesByGroup {
+    [CmdletBinding()]
+    param (
+        
+    )
+    
+    begin {
+        
     }
-    $g | Add-Member -name "Size" -MemberType NoteProperty -Value $groupsize;
+    
+    process {
+        
+    }
+    
+    end {
+        
+    }
 }
 $groups | select @{Name = "Date"; Expression = { $_.Name } }, @{Name = "Number of Files"; Expression = { $_.Count } }, Size | sort-object -property "Date" | Format-Table -AutoSize;
 
