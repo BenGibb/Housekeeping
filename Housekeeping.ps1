@@ -66,14 +66,23 @@ function Get-FilesGrouped {
                 Expression = { $_.GetType().Name -eq 'DirectoryInfo' }
             }
         )
+            $GroupMeasure = @{
+                Sum = $true
+                Average = $true
+                Maximum = $true
+                Minimum = $true
+            }
     }
     
     process {
         $Groups = get-childitem -Path $Path |
             Select-Object -Property $FileProperties |
             group-object -property $GroupBy
-        foreach ($Group in $Groups) {
-            $Group | Add-Member -name "Size" -MemberType NoteProperty -Value $($Group.Group.length | Measure-Object -Sum).Sum
+            foreach ($Group in $Groups) {
+            $GroupSize = $($Group.Group.length | Measure-Object @GroupMeasure)
+            foreach ($Measurement in $GroupMeasure.Keys) {
+                $Group | Add-Member -name $Measurement -MemberType NoteProperty -Value $GroupSize.$Measurement
+            }
         }
     }
     
@@ -82,7 +91,7 @@ function Get-FilesGrouped {
     }
 }
 
-
+#Get-FilesGrouped -Path 'c:\windows' -ByCreated
 <# 
 function Move-FilesByGroup {
     [CmdletBinding()]
