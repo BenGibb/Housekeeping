@@ -93,6 +93,7 @@ function Get-FilesGrouped {
 
 #Get-FilesGrouped -Path 'c:\windows' -ByCreated
 function Move-FileGroups {
+    #Todo: Groups(source), Destination, Exclusions(bygroup?|filter?), Deletions(bygroup?|filter?), Copyonly?(Switch)
     [CmdletBinding()]
     param (
         
